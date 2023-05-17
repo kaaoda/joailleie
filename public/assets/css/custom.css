@@ -1,0 +1,41 @@
+
+/*# sourceMappingURL=data:application/json;charset=utf8;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiY3VzdG9tLmNzcyIsInNvdXJjZXMiOlsiY3VzdG9tLnNjc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IiJ9 */
+
+/*# sourceMappingURL=custom.css.map */
+
+label > .fas, .far, .fab, .fal
+{
+    font-size: 10px;
+}
+
+.nice-select,
+.nice-select-dropdown {
+    width: 100%;
+}
+
+.transfer-double
+{
+    position: unset;
+}
+
+.table.table-bordered td, .table.table-bordered th 
+{
+    vertical-align: middle;
+}
+
+.card .card-header .btn:not(.note-btn) {
+    border-radius:unset 
+    
+}
+
+@media print {
+    .invoice
+    {
+        padding: 10px;
+    }
+
+    .main-content
+    {
+        padding-top: 20px;
+    }
+}
