@@ -29,9 +29,10 @@ class StoreInvoiceRequest extends FormRequest
             "paid_amount" => ['required', "numeric", 'min:0'],
             "payment" => ['nullable', 'array'],
             "next_due_date" => ['nullable', Rule::requiredIf(function(){
-                return count($this->payment) == 0 || Order::findOrFail($this->id)->total > $this->paid_amount;
+                return count($this->payment) == 0; //|| Order::findOrFail($this->id)->total > $this->paid_amount;
             }), 'date', 'date_format:Y-m-d'],
             "currency_id" => ["nullable", "exists:currencies,id"],
+            "user_id" => ["required", "exists:users,id"],
             "foreign_paid" => ["nullable", "numeric", "min:0.001"]
         ];
     }

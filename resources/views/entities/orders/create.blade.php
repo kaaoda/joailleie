@@ -152,6 +152,11 @@
         const resultsContainer = $("div#selected-products");
         const productsAdded = [];
 
+        $(document).on("change", "input.sale_price_input", function(event){
+            if($(this).data('division') === "GOLD")
+                $(this).parent().parent().find("input.price_per_gram_input").val(Math.ceil($(this).val() / $(this).data('weight')));
+        });
+
         $("input#barcode-search").on("change", function(event) {
             if (!$(this).val()) return
             axios.post("{{ route('products.searchByBarcodeWithAjax') }}", {
@@ -164,16 +169,31 @@
                             const li =
                                 `<div class="form-row" id="${product.id}">
                                     <input type="number" hidden value="${product.id}" name="products[]" />
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-2">
                                     <label for="productName-${product.id}">Product</label>
                                     <input type="text" class="form-control" id="productName-${product.id}" readonly value="${product.barcode}" />
-                                    <small id="passwordHelpBlock" class="form-text text-muted">Weight is ${product.weight}g / ${product.kerat}k</small>
                                 </div>
-                                <div class="form-group col-md-4">
-                                    <label for="productPrice-${product.id}">${product.category.division.name == "GOLD" ? 'Sale manufacturing value' : 'Sale Price'}</label>
-                                    <input type="text" class="form-control" name="prices[${product.id}]" id="productPrice-${product.id}" />
+                                <div class="form-group col-md-2">
+                                    <label for="zgrrr-${product.id}">Desc.</label>
+                                    <input type="text" class="form-control" readonly disabled id="zgrrr-${product.id}" value="${product.category.division.name} ${product.category.name}" />
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-2">
+                                    <label for="bdbf-${product.id}">Weight</label>
+                                    <input type="text" class="form-control" readonly disabled id="bdbf-${product.id}" value="${product.weight}" />
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="fbmdlfnmf-${product.id}">${product.category.division.name == "GOLD" ? 'Masna3ya' : 'Product Price' }</label>
+                                    <input type="text" class="form-control" readonly disabled id="fbmdlfnmf-${product.id}" value="${product.manufacturing_value}" />
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="productPrice-${product.id}">Sale Price</label>
+                                    <input type="text" class="form-control sale_price_input" name="prices[${product.id}]" id="productPrice-${product.id}" data-division="${product.category.division.name}" data-weight="${product.weight}" />
+                                </div>
+                                <div class="form-group col-md-2">
+                                    <label for="bgfdub-${product.id}">Price/Gram</label>
+                                    <input type="text" class="form-control price_per_gram_input" readonly disabled id="bgfdub-${product.id}" value="0" />
+                                </div>
+                                <div class="form-group col-md-2">
                                     <label for="discount-${product.id}">Discount</label>
                                     <input type="text" class="form-control" name="discounts[${product.id}]" id="discount-${product.id}" />
                                 </div>

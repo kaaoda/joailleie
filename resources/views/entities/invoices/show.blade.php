@@ -6,6 +6,12 @@
 @endpush
 
 @section('mainContent')
+    @if ($invoice->invoicable->orderReturn)
+        <span class="stamp is-draft">Draft</span>
+        @if ($invoice->invoicable->orderReturn->type === "RETURN")
+            <span class="stamp is-nope">Refunded</span>
+        @endif
+    @endif
     <section class="section">
         <div class="section-body">
             <div class="invoice">
@@ -22,9 +28,15 @@
                                 <div class="col-6">
                                     <address>
                                         <strong>Billed To:</strong><br>
-                                        {{ $invoice->invoicable->customer->full_name }}<br>
-                                        {{ $invoice->invoicable->customer->phone_number }}<br>
-                                        {{ $invoice->invoicable->customer->email }}
+                                        @if ($invoice->invoicable_type == App\Models\Order::class)
+                                            {{ $invoice->invoicable->customer->full_name }}<br>
+                                            {{ $invoice->invoicable->customer->phone_number }}<br>
+                                            {{ $invoice->invoicable->customer->email }}
+                                        @else
+                                            {{ $invoice->invoicable->order->customer->full_name }}<br>
+                                            {{ $invoice->invoicable->order->customer->phone_number }}<br>
+                                            {{ $invoice->invoicable->order->customer->email }}
+                                        @endif
                                     </address>
                                 </div>
                             </div>
@@ -32,7 +44,7 @@
                                 <div class="col-6">
                                     <address>
                                         <strong>Employee:</strong><br>
-                                        Mohamed Ameen
+                                        {{$invoice->user->name}}
                                     </address>
                                 </div>
                                 <div class="col-6 text-right">
@@ -65,9 +77,11 @@
                                             <td>
                                                 {{ $loop->iteration }}</td>
                                             <td colspan="2">
+                                                <img alt="image" class="rounded-circle" width="50" src="{{ $product->thumbnail_path }}">
                                                 {{ $product->barcode }}</td>
+                                            
                                             <td>
-                                                {{ $product->pivot->price / $product->pivot->quantity }}
+                                                {{ $product->pivot->price }}
                                                 {{ mainCurrency()->code }}</td>
                                             <td>
                                                 {{ $product->weight }}g</td>

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\OrderReturn;
 use App\Models\ProductTransferRequest;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
@@ -39,5 +40,6 @@ class RouteServiceProvider extends ServiceProvider
         });
 
         Route::model("transfer", ProductTransferRequest::class);
+        Route::model("return", OrderReturn::class);
     }
 }

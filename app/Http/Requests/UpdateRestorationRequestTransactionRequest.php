@@ -11,7 +11,7 @@ class UpdateRestorationRequestTransactionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class UpdateRestorationRequestTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "restoration_request_id" => "nullable|exists:restoration_requests,id",
+            "employee_name" => "nullable|string|max:255",
+            "description" => "nullable|string",
+            "happened_at" => "nullable|date"
         ];
     }
 }

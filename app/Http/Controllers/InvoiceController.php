@@ -8,8 +8,9 @@ use App\Http\Requests\UpdateInvoiceRequest;
 use App\Models\Currency;
 use App\Models\InvoicePayment;
 use App\Models\Order;
+use App\Models\User;
+use App\Models\OrderReturn;
 use App\Models\PaymentMethod;
-use App\Models\ProductReturn;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -23,7 +24,7 @@ class InvoiceController extends Controller
      */
     public function index()
     {
-        //
+        
     }
 
     /**
@@ -39,9 +40,24 @@ class InvoiceController extends Controller
                 "paymentMethods" => PaymentMethod::all(),
                 "order" => $order,
                 'diamonds' => $order->products->pluck('diamonds')->collapse(),
-                "currencies" => Currency::where("main", FALSE)->get()
+                "currencies" => Currency::where("main", FALSE)->get(),
+                "users" => User::all()
             ]);
-        } else
+        } 
+        elseif ($request->has("orderReturn")) {
+            $orderReturn = OrderReturn::findOrFail($request->query("orderReturn"));
+            if($orderReturn->type === "RETURN" || ($orderReturn->type === "EXCHANGE" && $orderReturn->diff_amount < 0)) return back();
+            if ($orderReturn->invoice) return redirect()->route("invoices.show", ['invoice' => $orderReturn->invoice->id]);
+            $orderReturn->load(["order", "order.customer", "products", "products.diamonds.currency"]);
+            return view("entities.invoices.create", [
+                "paymentMethods" => PaymentMethod::all(),
+                "orderReturn" => $orderReturn,
+                'diamonds' => $orderReturn->products->pluck('diamonds')->collapse(),
+                "currencies" => Currency::where("main", FALSE)->get(),
+                "users" => User::all()
+            ]);
+        }
+        else
             return back();
     }
 
@@ -53,7 +69,8 @@ class InvoiceController extends Controller
             $divisionId = Str::afterLast($division, 'payment:');
             if($divisionId === "customerBalance")
             {
-                $invoice->invoicable->customer->decrement("balance", $paymentAmount);
+                if($invoice->invoicable_type === Order::class)
+                    $invoice->invoicable->customer->decrement("balance", $paymentAmount);
             }
             else
             {
@@ -66,7 +83,7 @@ class InvoiceController extends Controller
             }
         }
 
-        if ($safeData->foreign_paid) {
+        if (isset($safeData->foreign_paid)) {
             $currency = Currency::find($safeData->currency_id);
             $paymentMethodsDivisions[] = new InvoicePayment([
                 "payment_method_id" => PaymentMethod::where("name", "Cash")->first()->id,
@@ -88,21 +105,23 @@ class InvoiceController extends Controller
     public function store(StoreInvoiceRequest $request)
     {
         $safe = $request->safe();
-
-        $order = Order::findOrFail($safe->id);
-
+        
+        $order = $safe->type === "order" ? Order::findOrFail($safe->id) : OrderReturn::findOrFail($safe->id);
+        
+        $lastTnvoice = Invoice::latest()->first();
+        //return response($lastTnvoice ? (int)$lastTnvoice->id + 1 : 1);
         try {
-            $response = DB::transaction(function () use ($safe, $order) {
+            $response = DB::transaction(function () use ($safe, $order, $lastTnvoice) {
                 $invoice = Invoice::create([
-                    "invoicable_type" => $safe->type === "order" ? Order::class : ProductReturn::class,
+                    "invoicable_type" => $safe->type === "order" ? Order::class : OrderReturn::class,
                     "invoicable_id" => $safe->id,
-                    "invoice_number" => str_replace("ORD", "INV", $order->order_number),
+                    "invoice_number" => $lastTnvoice !== NULL ? "INV-00" . (int)$lastTnvoice->id + 1 : "INV-00" . 1,
                     "date" => now(),
                     "paid_amount" => $safe->paid_amount > $order->total ? $order->total : $safe->paid_amount,
                     "completed" => $safe->paid_amount >= $order->total,
                     "next_due_date" => $safe->paid_amount < $order->total ? $safe->next_due_date : NULL,
-                    "employee_id" => 1,
-                    "product_division_id" => $order->products->first()->division->id
+                    "user_id" => $safe->user_id,
+                    "product_division_id" => $order->products()->first()->division->id
                 ]);
 
                 if($safe->paid_amount > $order->total)
@@ -123,7 +142,12 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
-        $invoice->load(["invoicable.products.diamonds.currency", "invoicable.customer", "payments.PaymentMethod", "payments.currency"]);
+        $this->authorize("view", $invoice);
+        $invoice->load(["invoicable.products.diamonds.currency", "payments.PaymentMethod", "payments.currency"]);
+        if($invoice->invoicable_type === Order::class)
+            $invoice->load(["invoicable.customer"]);
+        else
+            $invoice->load(["invoicable.order.customer"]);
         $diamonds = $invoice->invoicable->products->pluck('diamonds')->collapse();
         $formatter = new NumberFormatter("ar_EG", NumberFormatter::SPELLOUT);
         return view("entities.invoices.show", compact('invoice', 'diamonds', 'formatter'));

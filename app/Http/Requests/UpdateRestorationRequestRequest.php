@@ -11,7 +11,7 @@ class UpdateRestorationRequestRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,12 @@ class UpdateRestorationRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "customer_id" => 'nullable|exists:customers,id',
+            "weight" => "nullable|numeric|min:0",
+            "deposit" => "nullable|numeric|min:0",
+            "cost" => "nullable|numeric|min:0",
+            "notices" => "nullable|string",
+            "status" => 'nullable|in:on,off'
         ];
     }
 }

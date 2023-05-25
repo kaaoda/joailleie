@@ -32,7 +32,7 @@
                                         @forelse ($list as $order)
                                             <tr>
                                                 <td>{{$loop->iteration}}</td>
-                                                <td>{{$order->order_number}}</td>
+                                                <td>{{$order->order_number}} @if($order->orderReturn) <i class="fas fa-undo text-danger"></i> @endif</td>
                                                 <td>{{$order->customer->full_name}}</td>
                                                 <td>{{$order->branch->name}}</td>
                                                 <td>{{$order->created_at}}</td>
@@ -43,7 +43,10 @@
                                                         <div class="badge badge-warning"><i class="fas fa-exclamation-triangle"></i></div>
                                                     @endif
                                                 </td>
-                                                <td><a href="{{route('orders.show', ['order' => $order->id])}}" class="btn btn-icon btn-sm btn-info"><i class="fas fa-eye"></i></a></td>
+                                                <td>
+                                                    <button onclick="deleteModel('{{route('orders.destroy', ['order' => $order->id])}}', $(this).parent('td').parent('tr'))" class="btn btn-icon btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                                    <a href="{{route('orders.show', ['order' => $order->id])}}" class="btn btn-icon btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                                </td>
                                             </tr>
                                         @empty
                                         <tr class="text-center">
@@ -70,4 +73,5 @@
     <script src="{{ asset('assets/bundles/izitoast/js/iziToast.min.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- Page Specific JS File -->
+    <script src="{{ asset('assets/js/deleteModel.js') }}"></script>
 @endpush

@@ -16,7 +16,8 @@ class Due extends Model
         "dueable_type",
         "dueable_id",
         "paid_amount",
-        "paid_at"
+        "paid_at",
+        "notices"
     ];
 
     public function dueable()

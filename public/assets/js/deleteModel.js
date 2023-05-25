@@ -14,7 +14,7 @@ function deleteModel (url, trElement = null) {
             console.log(err);
             iziToast.warning({
                 title: 'Error!',
-                message: err.response.data.error,
+                message: err.response.data.error | err.response.data.message,
                 position: 'topRight'
             });
         })

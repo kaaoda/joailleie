@@ -11,7 +11,7 @@ class StoreRestorationRequestTransactionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class StoreRestorationRequestTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "restoration_request_id" => "required|exists:restoration_requests,id",
+            "employee_name" => "required|string|max:255",
+            "description" => "required|string",
+            "happened_at" => "required|date"
         ];
     }
 }

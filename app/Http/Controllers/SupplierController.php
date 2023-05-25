@@ -7,6 +7,8 @@ use App\Http\Requests\StoreSupplierRequest;
 use App\Http\Requests\UpdateSupplierRequest;
 use App\Models\Currency;
 use App\Models\ProductDivision;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 class SupplierController extends Controller
 {
@@ -51,7 +53,14 @@ class SupplierController extends Controller
             "supplier" => $supplier->loadCount("transactions")->loadSum("transactions", "ore_weight_in_grams"),
             "transactions" => $supplier->transactions()->with("division")->paginate(5),
             "currencies" => Currency::all(),
-            "divisions" => ProductDivision::all()
+            "divisions" => ProductDivision::all(),
+            "goldIn" => $supplier->products()->sum('weight'),
+            "goldOut" => $totalWeight = DB::table('suppliers')
+                ->join('products', 'suppliers.id', '=', 'products.supplier_id')
+                ->join('order_product', 'products.id', '=', 'order_product.product_id')
+                ->join('orders', 'order_product.order_id', '=', 'orders.id')
+                ->where('suppliers.id', $supplier->id)
+                ->sum('products.weight')
         ]);
     }
 
@@ -76,6 +85,14 @@ class SupplierController extends Controller
      */
     public function destroy(Supplier $supplier)
     {
-        //
+        try {
+            $supplier->deleteOrFail();
+            return response(["success" => "Supplier deleted"]);
+        } catch (QueryException $e) {
+            return response([
+                "error" => "This record can't deleted!",
+                "sql" => $e->getMessage()
+            ], 400);
+        }
     }
 }

@@ -4,8 +4,8 @@
 
 @push('cssPageDependencies')
     <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/datatables.min.css') }}">
-    <link rel="stylesheet"
-        href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bundles/datatables/DataTables-1.10.16/css/dataTables.bootstrap4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/bundles/izitoast/css/iziToast.min.css') }}">
 @endpush
 
 @section('mainContent')
@@ -42,7 +42,11 @@
                                                 <td>{{$supplier->name}}</td>
                                                 <td>{{$supplier->contact_name}}</td>
                                                 <td>{{$supplier->phone_number}}</td>
-                                                <td><a href="{{route('suppliers.show', ['supplier' => $supplier->id])}}" class="btn btn-info">Detail</a></td>
+                                                <td>
+                                                    <button onclick="deleteModel('{{route('suppliers.destroy', ['supplier' => $supplier->id])}}', $(this).parent('td').parent('tr'))" class="btn btn-icon btn-sm btn-danger"><i class="fas fa-trash"></i></button>
+                                                    <a href="{{route('suppliers.edit', ['supplier' => $supplier->id])}}" class="btn btn-icon btn-sm btn-primary"><i class="fas fa-edit"></i></a>
+                                                    <a href="{{route('suppliers.show', ['supplier' => $supplier->id])}}" class="btn btn-icon btn-sm btn-info"><i class="fas fa-eye"></i></a>
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -60,7 +64,9 @@
     <!-- JS Libraies -->
     <script src="{{ asset('assets/bundles/datatables/datatables.min.js') }}"></script>
     <script src="{{ asset('assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('assets/bundles/jquery-ui/jquery-ui.min.js') }}"></script>
+    <script src="{{asset('assets/bundles/izitoast/js/iziToast.min.js')}}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- Page Specific JS File -->
     <script src="{{ asset('assets/js/page/datatables.js') }}"></script>
+    <script src="{{ asset('assets/js/deleteModel.js') }}"></script>
 @endpush

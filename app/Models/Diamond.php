@@ -10,7 +10,8 @@ class Diamond extends Model
     use HasFactory;
 
     protected $fillable = [
-        "product_id",
+        "diamondable_type",
+        "diamondable_id",
         "number_of_stones",
         "weight",
         "clarity",

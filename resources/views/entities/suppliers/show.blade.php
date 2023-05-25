@@ -98,9 +98,10 @@
                                     <div class="selectgroup w-100">
                                         @foreach ($divisions as $division)
                                             <label class="selectgroup-item">
-                                                <input type="radio" name="product_division_id" value="{{$division->id}}"
-                                                    class="selectgroup-input-radio" checked="">
-                                                <span class="selectgroup-button">{{$division->name}}</span>
+                                                <input type="radio" name="product_division_id"
+                                                    value="{{ $division->id }}" class="selectgroup-input-radio"
+                                                    checked="">
+                                                <span class="selectgroup-button">{{ $division->name }}</span>
                                             </label>
                                         @endforeach
                                     </div>
@@ -176,6 +177,24 @@
                     </div>
                 </div>
                 <div class="col-12 col-md-12 col-lg-8">
+                    <div class="card profile-widget mt-0">
+                        <div class="profile-widget-header mb-0">
+                            <div class="profile-widget-items">
+                                <div class="profile-widget-item">
+                                    <div class="profile-widget-item-label">Gold In</div>
+                                    <div class="profile-widget-item-value">{{$goldIn}}g</div>
+                                </div>
+                                <div class="profile-widget-item">
+                                    <div class="profile-widget-item-label">Gold Out</div>
+                                    <div class="profile-widget-item-value">{{$goldOut}}g</div>
+                                </div>
+                                <div class="profile-widget-item">
+                                    <div class="profile-widget-item-label">Rest</div>
+                                    <div class="profile-widget-item-value">{{$goldIn - $goldOut}}g</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="card">
                         <div class="padding-20">
                             <ul class="nav nav-tabs" id="myTab2" role="tablist">
@@ -235,7 +254,8 @@
                                                             <div class="collapse"
                                                                 id="transactionDetails-{{ $transaction->id }}">
                                                                 <div class="table-responsive">
-                                                                    <table class="table table-bordered table-sm text-center">
+                                                                    <table
+                                                                        class="table table-bordered table-sm text-center">
                                                                         <thead>
                                                                             <tr>
                                                                                 <th>Currency</th>
@@ -245,9 +265,11 @@
                                                                         </thead>
                                                                         <tbody>
                                                                             <tr>
-                                                                                <th>{{$transaction->currency->code}}</th>
-                                                                                <td>{{ number_format($transaction->paid_amount) }}</td>
-                                                                                <td>{{ $transaction->products_number }}</td>
+                                                                                <th>{{ $transaction->currency->code }}</th>
+                                                                                <td>{{ number_format($transaction->paid_amount) }}
+                                                                                </td>
+                                                                                <td>{{ $transaction->products_number }}
+                                                                                </td>
                                                                             </tr>
                                                                         </tbody>
                                                                     </table>
@@ -264,10 +286,12 @@
 
                                     </div>
                                 </div>
-                                <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="profile-tab2">
+                                <div class="tab-pane fade" id="settings" role="tabpanel"
+                                    aria-labelledby="profile-tab2">
                                     <form method="post" class="needs-validation" action="{{ route('dues.store') }}">
                                         @csrf
-                                        <input type="hidden" name="dueable_type" value="{{ App\Models\Supplier::class }}">
+                                        <input type="hidden" name="dueable_type"
+                                            value="{{ App\Models\Supplier::class }}">
                                         <input type="hidden" name="dueable_id" value="{{ $supplier->id }}">
                                         <div class="card-header">
                                             <h4>Add Payment</h4>

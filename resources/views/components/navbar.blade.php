@@ -79,7 +79,7 @@
                     src="{{asset('assets/img/user.png')}}" class="user-img-radious-style"> <span
                     class="d-sm-none d-lg-inline-block"></span></a>
             <div class="dropdown-menu dropdown-menu-right pullDown">
-                <div class="dropdown-title">Hello {{auth()->user()->full_name?? "User"}}</div>
+                <div class="dropdown-title">Hello {{auth()->user()->name?? "User"}}</div>
                 <a href="profile.html" class="dropdown-item has-icon"> <i class="far
 										fa-user"></i> Profile
                 </a> <a href="timeline.html" class="dropdown-item has-icon"> <i class="fas fa-bolt"></i>

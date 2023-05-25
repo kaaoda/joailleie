@@ -94,18 +94,10 @@
                                 </li>
                                 <li class="media">
                                     <div class="media-body">
-                                        <div class="media-title">Image</div>
-                                    </div>
-                                    <div class="media-progressbar">
-                                        {!! $barcode !!}
-                                    </div>
-                                </li>
-                                <li class="media">
-                                    <div class="media-body">
-                                        <div class="media-title">Type</div>
+                                        <div class="media-title">Print</div>
                                     </div>
                                     <div class="float-right">
-                                        CODE-128
+                                        <a target="_blank" href="{{route('bulk.printBarcode',['barcode'=>[$product->barcode]])}}" class="btn btn-primary">Print Barcode</a>
                                     </div>
                                 </li>
                             </ul>

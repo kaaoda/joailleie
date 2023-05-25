@@ -13,7 +13,9 @@ use App\Models\ProductCategory;
 use App\Models\Supplier;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Milon\Barcode\DNS1D;
 
 class ProductController extends Controller
@@ -24,6 +26,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = Product::with(["category:id,name", "branch:id,name"]);
+        if(Gate::denies("isManager")) $products->whereRelation("branch", "id", "=", Auth::user()->branch_id);
         if ($request->has("search"))
             $products->where("barcode", "LIKE", "%" . $request->query("search") . "%");
         if ($request->has("branch"))
@@ -41,7 +44,9 @@ class ProductController extends Controller
                 "barcode" => ["required"]
             ]);
 
-            return Product::where("barcode", $safe['barcode'])->with(['category', 'category.division'])->firstOrFail();
+            $product = Product::where("barcode", $safe['barcode'])->with(['category', 'category.division']);
+            if (Gate::denies("isManager")) $product->whereRelation("branch", "id", "=", Auth::user()->branch_id);
+            return $product->firstOrFail();
         }
         abort(403);
     }
@@ -129,7 +134,7 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        $barcode = DNS1D::getBarcodeHTML($product->barcode, "C128",1.5,33);
+        $barcode = DNS1D::getBarcodeHTML($product->barcode, "C128",1.5,33, showCode:TRUE);
         $customers_number = Customer::whereRelation("orders.products", "product_id", $product->id)->count();
         $product->load("category")
             ->load("branch")

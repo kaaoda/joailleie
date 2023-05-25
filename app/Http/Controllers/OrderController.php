@@ -7,13 +7,18 @@ use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\Invoice;
 use App\Models\OrderAdditionalService;
+use App\Models\OrderReturn;
 use App\Models\Product;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use stdClass;
 
 
@@ -36,7 +41,7 @@ class OrderController extends Controller
     {
         return view("entities.orders.create", [
             "customers" => Customer::all(["id", "full_name"]),
-            "branches" => Branch::all(["id", "name"])
+            "branches" => Gate::allows("isManager") ? Branch::all(["id", "name"]) : Branch::where("id", Auth::user()->branch_id)->get()
         ]);
     }
 
@@ -54,9 +59,12 @@ class OrderController extends Controller
 
         //get detailed products
         foreach ($safe->products as $product_id) :
+            $fetchedProduct = Product::find($product_id);
             $safeData->products[] = (object)[
                 "id" => $product_id,
-                "sale_manufacturing_value" => $safe->prices[$product_id],
+                "sale_manufacturing_value" => $fetchedProduct->division->name === "GOLD" 
+                ? ceil(($safe->prices[$product_id] / $fetchedProduct->weight) - $safe->goldPrice)
+                : $safe->prices[$product_id],
                 "quantity" => 1,
                 "gram_price" => $safe->goldPrice
             ];
@@ -89,10 +97,7 @@ class OrderController extends Controller
         $products = [];
         $totalProductsPrice = 0;
         foreach ($safeData->products as $product) :
-            $fetchedProduct = Product::find($product->id);
-            $productPrice = strtolower($fetchedProduct->division->name) === "gold" 
-            ? ($product->sale_manufacturing_value + $safeData->goldPrice) * $fetchedProduct->weight
-            : $product->sale_manufacturing_value;
+            $productPrice = $product->sale_manufacturing_value;
             $products[$product->id] = [
                 "price" => $productPrice,
                 "quantity" => $product->quantity,
@@ -125,11 +130,22 @@ class OrderController extends Controller
         return $order;
     }
 
+    private static function checkStorePermission(Request $request)
+    {
+        if(Gate::denies('isManager'))
+        {
+            if($request->input('branch_id') != Auth::user()->branch_id) abort("403", "How can you create order for other branch?");
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreOrderRequest $request)
     {
+        //check role
+        self::checkStorePermission($request);
+
         //get data from request
         $safeData = self::getDetailedOrderInfoFromRequest($request);
         //dd($safeData);
@@ -153,6 +169,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
+        $this->authorize("view", $order);
         $order->load(["customer", "products", "additionalServices"]);
         return view("entities.orders.show", compact("order"));
     }
@@ -178,6 +195,20 @@ class OrderController extends Controller
      */
     public function destroy(Order $order)
     {
-        //
+        try {
+            DB::transaction(function() use ($order){
+                $order->deleteOrFail();
+                if($order->invoice) Invoice::destroy($order->invoice->id);
+                if($order->orderReturn) OrderReturn::destroy($order->orderReturn->id);
+                if($order->orderReturn && $order->orderReturn->invoice) Invoice::destroy($order->orderReturn->invoice->id);
+            });
+            
+            return response(["success" => "Branch deleted"]);
+        } catch (QueryException $e) {
+            return response([
+                "error" => "This record can't deleted!",
+                "sql" => $e->getMessage()
+            ], 400);
+        }
     }
 }

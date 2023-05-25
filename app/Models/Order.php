@@ -18,9 +18,15 @@ class Order extends Model
         "date"
     ];
 
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);
+    }
+
+    public function orderReturn()
+    {
+        return $this->hasOne(OrderReturn::class);
     }
 
     public function branch()

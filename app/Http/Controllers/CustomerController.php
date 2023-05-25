@@ -5,7 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Customer;
 use App\Http\Requests\StoreCustomerRequest;
 use App\Http\Requests\UpdateCustomerRequest;
+use App\Models\Due;
+use App\Models\Invoice;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -69,7 +74,7 @@ class CustomerController extends Controller
     {
         $customer->loadCount("orders")->load("orders", "orders.invoice.dues");
         //dd($customer);
-        $debts = $customer->orders->sum(function($order){
+        $debts = $customer->orders->whereNotNull("invoice")->sum(function($order){
             $orderPaid = $order->total - $order->invoice->paid_amount;
             $invoiceDuesPaid = $order->invoice->dues->sum(function($due){
                 return $due->paid_amount;
@@ -78,7 +83,20 @@ class CustomerController extends Controller
         });
         $nearestOrder = $customer->orders->whereNotNull("invoice.next_due_date")->sortBy("invoice.next_due_date")->first();
         $nearestDueDate = $nearestOrder ? $nearestOrder->invoice->next_due_date : NULL;
-        return view("entities.customers.show", compact("customer", "debts", "nearestDueDate"));
+        $totalWeight = $customer->orders->sum(function($order){
+            return $order->products()->sum('weight');
+        });
+        $totalSpend = $customer->orders->sum(function ($order) {
+            return $order->invoice->paid_amount;
+        });
+        $invoices = $customer->orders->map(function ($order) {
+            return $order->invoice;
+        })->filter();
+
+        $invoiceDues = $invoices->flatMap(function ($invoice) {
+                return $invoice->dues;
+            })->filter();
+        return view("entities.customers.show", compact("customer", "debts", "nearestDueDate", 'totalWeight', "totalSpend", "invoiceDues"));
     }
 
     /**
@@ -104,6 +122,14 @@ class CustomerController extends Controller
      */
     public function destroy(Customer $customer)
     {
-        //
+        try {
+            $customer->deleteOrFail();
+            return response(["success" => "Customer deleted"]);
+        } catch (QueryException $e) {
+            return response([
+                "error" => "This record can't deleted!",
+                "sql" => $e->getMessage()
+            ], 400);
+        }
     }
 }

@@ -23,6 +23,12 @@
                                 <div class="author-box-description">
                                     @if ($order->invoice)
                                         <a href="{{route('invoices.show', ['invoice' => $order->invoice->id])}}" class="btn btn-icon icon-left btn-warning"><i class="fas fa-eye"></i>Show Invoice</a>
+                                        @if (!$order->orderReturn)
+                                            <a href="{{route('returns.create', ['order' => $order->id])}}" class="btn btn-icon icon-left btn-dark"><i class="fas fa-undo"></i>Return Order</a>
+                                        @else
+                                            <a href="{{route('returns.show', ['return' => $order->orderReturn->id])}}" class="btn btn-icon icon-left btn-warning"><i class="fas fa-eye"></i>Show Return Info</a>
+                                        @endif
+                                        
                                     @else
                                         <a href="{{route('invoices.create', ['order' => $order->id])}}" class="btn btn-icon icon-left btn-success"><i class="fas fa-file"></i>Create Invoice</a>
                                     @endif

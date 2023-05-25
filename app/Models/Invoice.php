@@ -33,7 +33,12 @@ class Invoice extends Model
 
     public function division()
     {
-        return $this->belongsTo(ProductDivision::class);
+        return $this->belongsTo(ProductDivision::class, "product_division_id");
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 
     public function invoicable()

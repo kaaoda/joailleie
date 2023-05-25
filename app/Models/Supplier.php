@@ -21,6 +21,11 @@ class Supplier extends Model
         return $this->hasMany(SupplyTransaction::class, "supplier_id");
     }
 
+    public function products()
+    {
+        return $this->hasMany(Product::class);
+    }
+
     public function dues()
     {
         return $this->morphMany(Due::class, 'dueable');

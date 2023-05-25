@@ -14,34 +14,37 @@
         <div class="section-body">
             <div class="row">
                 @include('components.alerts.success')
-                <div class="col-12">
-                    <div class="card mb-0">
-                        <div class="card-body">
-                            <ul class="nav nav-pills">
-                                <li class="nav-item">
-                                    <a class="nav-link @if(!request()->query("branch")) active @endif" href="{{request()->url()}}">All <span class="badge badge-primary">{{ $list->total() }}</span></a>
-                                </li>
-                                @foreach ($branches as $branch)
+                @can('isManager')
+                    <div class="col-12">
+                        <div class="card mb-0">
+                            <div class="card-body">
+                                <ul class="nav nav-pills">
                                     <li class="nav-item">
-                                        <a class="nav-link @if(request()->query("branch") == $branch->id) active @endif" href="{{ route('products.index',['branch' => $branch->id]) }}">{{$branch->name}} <span class="badge badge-primary">{{$branch->products_count}}</span></a>
+                                        <a class="nav-link @if(!request()->query("branch")) active @endif" href="{{request()->url()}}">All <span class="badge badge-primary">{{ $list->total() }}</span></a>
                                     </li>
-                                @endforeach
-                            </ul>
+                                    @foreach ($branches as $branch)
+                                        <li class="nav-item">
+                                            <a class="nav-link @if(request()->query("branch") == $branch->id) active @endif" href="{{ route('products.index',['branch' => $branch->id]) }}">{{$branch->name}} <span class="badge badge-primary">{{$branch->products_count}}</span></a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </div>
                         </div>
                     </div>
-                </div>
+                @endcan
             </div>
             <div class="row mt-4">
                 <div class="col-12">
                     <div class="card">
                         <div class="card-header justify-content-between">
                             <h4>All Products ({{ $list->total() }})</h4>
-                            <div class="btn-group mb-3" role="group" aria-label="Basic example">
-                                <a href="{{ route('products.create') }}" class="btn btn-icon icon-left btn-danger"><i class="fa fa-plus"></i> Add Product</a>
-                                <a href="{{ route('bulk.createGoldProducts') }}" class="btn btn-icon icon-left btn-warning"><i class="fas fa-database"></i> Add Bulk Gold</a>
-                                <a href="{{ route('bulk.createDiamondProducts') }}" class="btn btn-icon icon-left btn-success"><i class="fas fa-gem"></i> Add Bulk Diamond</a>
-                            </div>
-                            
+                            @can('isManager')
+                                <div class="btn-group mb-3" role="group" aria-label="Basic example">
+                                    <a href="{{ route('products.create') }}" class="btn btn-icon icon-left btn-danger"><i class="fa fa-plus"></i> Add Product</a>
+                                    <a href="{{ route('bulk.createGoldProducts') }}" class="btn btn-icon icon-left btn-warning"><i class="fas fa-database"></i> Add Bulk Gold</a>
+                                    <a href="{{ route('bulk.createDiamondProducts') }}" class="btn btn-icon icon-left btn-success"><i class="fas fa-gem"></i> Add Bulk Diamond</a>
+                                </div>
+                            @endcan
                         </div>
                         <div class="card-body">
                             <div class="float-left">
@@ -110,7 +113,7 @@
                                                 </div>
                                             </td>
                                             <td><a href="#">{{ $product->category->name }}</a></td>
-                                            <td>10-02-2019</td>
+                                            <td>{{ $product->created_at }}</td>
                                             <td>{{ $product->stock }}</td>
                                             <td>
                                                 @if($product->quarantined)

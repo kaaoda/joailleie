@@ -11,7 +11,7 @@ class StoreRestorationRequestRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,12 @@ class StoreRestorationRequestRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            "customer_id" => 'required|exists:customers,id',
+            "weight" => "required|numeric|min:0",
+            "deposit" => "required|numeric|min:0",
+            "cost" => "required|numeric|min:0",
+            "notices" => "required|string",
+            'picture_path' => "nullable|image|mimes:png,jpg"
         ];
     }
 }

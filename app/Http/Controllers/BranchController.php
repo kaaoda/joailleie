@@ -7,6 +7,7 @@ use App\Http\Requests\StoreBranchRequest;
 use Illuminate\Database\QueryException;
 use App\Http\Requests\UpdateBranchRequest;
 use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class BranchController extends Controller
 {
@@ -16,7 +17,7 @@ class BranchController extends Controller
     public function index()
     {
         return view("entities.branches.index", [
-            "list" => Branch::withCount("products")->withCount("users")->withCount("employees")->get()
+            "list" => Branch::withCount("products")->withSum('products as sum_weight', 'weight')->get()
         ]);
     }
 

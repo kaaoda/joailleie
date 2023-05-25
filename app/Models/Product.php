@@ -72,6 +72,6 @@ class Product extends Model
 
     public function setBarcodeAttribute($value)
     {
-        $this->attributes['barcode'] = $value ?? $this->division->name . rand(1, 999999) . str_replace([',','.'], "", $this->weight);
+        $this->attributes['barcode'] = $value ?? substr($this->category->name,0,1) . rand(1, 9999999) . str_replace([',','.'], "", $this->weight);
     }
 }

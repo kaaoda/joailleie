@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Employee;
 use App\Http\Requests\StoreEmployeeRequest;
 use App\Http\Requests\UpdateEmployeeRequest;
+use App\Models\Branch;
 
 class EmployeeController extends Controller
 {
@@ -13,7 +14,9 @@ class EmployeeController extends Controller
      */
     public function index()
     {
-        //
+        return view('entities.employees.index', [
+            'list' => Employee::with('branch')->get() 
+        ]);
     }
 
     /**
@@ -21,7 +24,9 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        //
+        return view('entities.employees.createOrEdit', [
+            'branches' => Branch::all(['id', 'name'])
+        ]);
     }
 
     /**
@@ -29,7 +34,8 @@ class EmployeeController extends Controller
      */
     public function store(StoreEmployeeRequest $request)
     {
-        //
+        $safe = $request->safe()->toArray();
+        return Employee::storeModel($safe, "Employee file created", "employees.index");
     }
 
     /**
@@ -61,6 +67,6 @@ class EmployeeController extends Controller
      */
     public function destroy(Employee $employee)
     {
-        //
+        return Employee::deleteModel($employee);
     }
 }

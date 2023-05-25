@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('dues', function (Blueprint $table) {
             $table->id();
             $table->morphs("dueable");
-            $table->unsignedDecimal("paid_amount");
+            $table->decimal("paid_amount");
             $table->date("paid_at");
             $table->timestamps();
         });

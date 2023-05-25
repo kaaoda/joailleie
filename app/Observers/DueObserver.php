@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Models\Customer;
 use App\Models\Due;
 use App\Models\Invoice;
 use App\Models\Supplier;
@@ -17,6 +18,9 @@ class DueObserver
         {
             case Invoice::class:
                 $invoice = Invoice::with(["invoicable", "dues"])->find($due->dueable_id);
+                $due->update([
+                    "notices" => "Invoice #".$invoice->invoice_number
+                ]);
                 if($invoice->invoicable->total == ($invoice->paid_amount + $invoice->dues->sum("paid_amount")))
                     $invoice->update([
                         "completed" => TRUE
@@ -24,6 +28,10 @@ class DueObserver
                 break;
             case Supplier::class:
                 Supplier::find($due->dueable_id)->increment('balance', $due->paid_amount);
+                break;
+            
+            case Customer::class:
+                Customer::find($due->dueable_id)->increment('balance', $due->paid_amount);
                 break;
         }
     }

@@ -27,8 +27,7 @@
                                             <th>#</th>
                                             <th>Name</th>
                                             <th>Products</th>
-                                            <th>Users</th>
-                                            <th>Employees</th>
+                                            <th>Gold</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -40,8 +39,7 @@
                                                 </td>
                                                 <td>{{$branch->name}}</td>
                                                 <td>{{$branch->products_count}}</td>
-                                                <td>{{$branch->users_count}}</td>
-                                                <td>{{$branch->employees_count}}</td>
+                                                <td>{{$branch->sum_weight}}g ({{$branch->sum_weight / 1000}} k)</td>
                                                 <td>
                                                     <button onclick="deleteModel('{{route('branches.destroy', ['branch' => $branch->id])}}', $(this).parent('td').parent('tr'))" class="btn btn-icon btn-sm btn-danger"><i class="fas fa-trash"></i></button>
                                                     <a href="{{route("branches.edit", ['branch' => $branch->id])}}" class="btn btn-icon btn-sm btn-primary"><i class="fas fa-edit"></i></a>
@@ -64,7 +62,6 @@
     <!-- JS Libraies -->
     <script src="{{ asset('assets/bundles/datatables/datatables.min.js') }}"></script>
     <script src="{{ asset('assets/bundles/datatables/DataTables-1.10.16/js/dataTables.bootstrap4.min.js') }}"></script>
-    <script src="{{ asset('assets/bundles/jquery-ui/jquery-ui.min.js') }}"></script>
     <script src="{{asset('assets/bundles/izitoast/js/iziToast.min.js')}}"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- Page Specific JS File -->

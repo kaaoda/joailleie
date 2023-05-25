@@ -21,7 +21,7 @@ class InvoicePolicy
      */
     public function view(User $user, Invoice $invoice): bool
     {
-        //
+        return $user->branch_id === $invoice->invoicable->branch_id || $user->role->canonical_name !== "sales";
     }
 
     /**

@@ -139,13 +139,13 @@
                                 </div>
                                 
                                 <div class="form-group row mb-4">
-                                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" id="manufacturingLabel">Manufacturing Value</label>
+                                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" id="manufacturingLabel">Cost per gram</label>
                                     <div class="col-sm-12 col-md-7">
                                         <input type="number" step="0.001" class="form-control" name="manufacturing_value" />
                                     </div>
                                 </div>
                                 <div class="form-group row mb-4">
-                                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" id="LowestManufacturingLabel">Lowest manufacturing value for sale</label>
+                                    <label class="col-form-label text-md-right col-12 col-md-3 col-lg-3" id="LowestManufacturingLabel">Lowest price for sale</label>
                                     <div class="col-sm-12 col-md-7">
                                         <input type="number" step="0.001" class="form-control" name="lowest_manufacturing_value_for_sale" />
                                     </div>
@@ -219,6 +219,7 @@
     <script src="{{ asset('assets/js/nice-select2.js') }}"></script>
     <script src="{{ asset('assets/bundles/jquery-selectric/jquery.selectric.min.js') }}"></script>
     <script src="{{ asset('assets/js/dynamic-form.js') }}"></script>
+    <script src="{{ asset('assets/js/rowfy.js') }}"></script>
     <script>
         $("#diamonds").hide()
         $.uploadPreview({
@@ -261,8 +262,8 @@
                 dynamic_form = null;
                 $("#diamonds").slideUp()
                 $("#kerat").slideDown()
-                $("#manufacturingLabel").html("Manufacturing Value");
-                $("#LowestManufacturingLabel").html("Lowest manufacturing value for sale");
+                $("#manufacturingLabel").html("Cost per gram");
+                $("#LowestManufacturingLabel").html("Lowest Price for sale");
             }
         });
     </script>

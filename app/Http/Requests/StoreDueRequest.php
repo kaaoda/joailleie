@@ -24,7 +24,7 @@ class StoreDueRequest extends FormRequest
         return [
             "dueable_type" => ["required", "string", "starts_with:App\\Models\\"],
             "dueable_id" => ['required', 'numeric', "min:1", "exists:".$this->dueable_type.",id"],
-            "paid_amount" => ['required', 'numeric', "min:1"],
+            "paid_amount" => ['required', 'numeric'],
             "paid_at" => ['required', 'date', "before_or_equal:today"],
             "notices" => ['nullable']
         ];
